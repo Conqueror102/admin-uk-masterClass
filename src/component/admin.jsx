@@ -60,7 +60,7 @@ const Admin = () => {
 
               {/* table */}
               <div
-                className={`bg-[#ffffff] shadow-lg h-[400px] max-sm:h-full group overflow-hidden mb-2  p-4 rounded-lg max-sm:p-2 `}
+                className={`bg-[#ffffff] shadow-lg h-[400px]  max-sm:h-full group overflow-hidden mb-2  p-4 rounded-lg max-sm:p-2 `}
               >
                 <div className="flex w-full justify-between ">
                   <p className="font-semibold text-lg pb-3">Candidates</p>
