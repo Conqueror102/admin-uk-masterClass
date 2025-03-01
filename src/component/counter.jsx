@@ -8,7 +8,7 @@ const Counter = ({icon, status,num,className}) => {
               {icon}
             </div>
             <div>
-            <p className="text-lg max-sm:text-[14px] font-medium text-gray-500">{status}</p>
+            <p className="text-lg max-sm:text-[16px] font-medium text-gray-500">{status}</p>
             <p className="text-2xl font-semibold">{num}</p>
             </div>
           </div>
