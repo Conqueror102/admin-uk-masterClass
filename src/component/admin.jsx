@@ -9,7 +9,7 @@ import Table from "./table";
 import axios from "axios";
 
 const Admin = () => {
-  const [state, setState] = useState("overView");
+  const [state, setState] = useState("candidate");
   const [view, setView] = useState(false);
 
   const [candidates, setCandidates] = useState([]);
