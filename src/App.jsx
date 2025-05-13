@@ -1,11 +1,11 @@
-import React from 'react'
-import Admin from './component/admin'
+
+import AllScreen from '../routes/AllScreen'
+
 
 const App = () => {
   return (
     <div>
-      <Admin/>
-
+     <AllScreen/>
     </div>
   )
 }
