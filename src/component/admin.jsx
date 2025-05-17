@@ -1,22 +1,84 @@
-import React, { useState } from "react";
-// import { RiDeleteBin6Line } from "react-icons/ri";
+import React, { useState, useEffect } from "react";
 import DashBoard from "./DashBoard";
 import Counter from "./counter";
-import { FaListCheck } from "react-icons/fa6";
+import { FaListCheck, FaUserShield } from "react-icons/fa6";
 import { LuBadgeAlert } from "react-icons/lu";
 import { PiClockCountdownBold } from "react-icons/pi";
 import { LuRotateCwSquare } from "react-icons/lu";
+import axios from 'axios';
 import Table from "./table";
+
+const WelcomeHeader = () => {
+  const adminName = "Super Admin"; // You could fetch this from context or state
+
+  return (
+    <div className="bg-green-100 py-4 px-6 rounded-md shadow-md flex items-center justify-between mt-4">
+      <div className="flex items-center">
+        <FaUserShield className="text-green-600 text-2xl mr-3" />
+        <div>
+          <h1 className="text-xl font-semibold text-green-700">
+            Welcome, <span className="text-green-800">{adminName}</span>!
+          </h1>
+          <p className="text-sm text-gray-600">
+            You are logged in as an administrator.
+          </p>
+        </div>
+      </div>
+      {/* You could add more elements here, like a notification icon or a quick action button */}
+      <div>
+        {/* Example quick action */}
+        {/* <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md text-sm">
+          + Add New User
+        </button> */}
+      </div>
+    </div>
+  );
+};
+
 const Admin = () => {
   const [state, setState] = useState("overView");
   const [view, setView] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
   const handleState = (click) => {
     setState(click);
   };
 
+  const allUsers = async () => {
+    try {
+      const res = await axios.get('https://ukmasterclassbackend.onrender.com/api/users/getAllUser');
+      const usersData = res.data;
+      const sortedUsers = usersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setUsers(sortedUsers);
+      setFilteredUsers(sortedUsers);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    allUsers();
+  }, []);
+
+  const handleSearch = (event) => {
+    const term = event.target.value.toLowerCase();
+    setSearchTerm(term);
+    const results = users.filter(user =>
+      user.firstName?.toLowerCase().includes(term) ||
+      user.lastName?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term) ||
+      user.number?.toLowerCase().includes(term) ||
+      user.countryOfOrigin?.toLowerCase().includes(term) ||
+      user.status?.toLowerCase().includes(term)
+    );
+    setFilteredUsers(results);
+  };
+
   return (
     <>
-      <div className=" bg-[#eeeeee] min-h-screen flex gap-5  max-sm:gap-0">
+      <div className=" bg-[#eeeeee] min-h-screen flex gap-5  max-sm:gap-0 relative">
         {/* dashboard */}
         <DashBoard
           overView={() => handleState("overView")}
@@ -25,6 +87,11 @@ const Admin = () => {
           isCandidatesActive={state === "candidate"}
         />
         <div className=" w-full space-y-8  max-sm:pt-0 pr-5 max-sm:pr-0 ">
+          {/* Styled Welcome Admin Header */}
+          <div className="px-4">
+            <WelcomeHeader />
+          </div>
+
           {/* the counters */}
           {state === "overView" && (
             <div className="px-4 ">
@@ -35,25 +102,25 @@ const Admin = () => {
                 <Counter
                   icon={<FaListCheck />}
                   status="Aproveded"
-                  num={30}
+                  num={users.filter(user => user.status === 'approved').length}
                   className={`text-green-600 bg-green-200`}
                 />
                 <Counter
                   icon={<LuBadgeAlert />}
                   status="Declined"
-                  num={20}
+                  num={users.filter(user => user.status === 'declined').length}
                   className={`text-red-600 bg-red-200`}
                 />
                 <Counter
                   icon={<PiClockCountdownBold />}
                   status="Pending"
-                  num={5}
+                  num={users.filter(user => user.status === 'pending').length}
                   className={`text-yellow-500 bg-yellow-200`}
                 />
                 <Counter
                   icon={<LuRotateCwSquare />}
                   status="Candidates"
-                  num={130}
+                  num={users.length}
                   className={`text-blue-600 bg-blue-200`}
                 />
               </div>
@@ -63,17 +130,11 @@ const Admin = () => {
                 className={`bg-[#ffffff] shadow-lg h-[400px]  max-sm:h-full group overflow-hidden mb-2  p-4 rounded-lg max-sm:p-2 `}
               >
                 <div className="flex w-full justify-between ">
-                  <p className="font-semibold text-lg pb-3">Candidates</p>
-
-                  {/* <input
-                    type="search"
-                    placeholder="search"
-                    className="border  border-gray-200 mb-2 py-1 px-3 rounded-2xl"
-                  /> */}
+                  <p className="font-semibold text-lg pb-3">Latest Candidates</p>
                 </div>
                 {/* table side */}
                 <div className="bg-[#e9fff0] max-sm:p-2 rounded-lg p-4 ">
-                  <Table />
+                  <Table candidates={filteredUsers.slice(0, 5)} />
                 </div>
               </div>
               <div
@@ -99,13 +160,15 @@ const Admin = () => {
 
                 <input
                   type="search"
-                  placeholder="search"
+                  placeholder="Search candidates..."
                   className="border  border-gray-200  py-1 px-3 rounded-2xl"
+                  value={searchTerm}
+                  onChange={handleSearch}
                 />
               </div>
               {/* table side */}
               <div className="bg-[#e9fff0]  rounded-lg p-4">
-                <Table />
+                <Table candidates={filteredUsers} />
               </div>
             </div>
           )}
@@ -116,3 +179,158 @@ const Admin = () => {
 };
 
 export default Admin;
+
+// import React, { useState, useEffect } from "react";
+// import DashBoard from "./DashBoard";
+// import Counter from "./counter";
+// import { FaListCheck } from "react-icons/fa6";
+// import { LuBadgeAlert } from "react-icons/lu";
+// import { PiClockCountdownBold } from "react-icons/pi";
+// import { LuRotateCwSquare } from "react-icons/lu";
+// import axios from 'axios';
+// import Table from "./table";
+
+// const Admin = () => {
+//   const [state, setState] = useState("overView");
+//   const [view, setView] = useState(false);
+//   const [users, setUsers] = useState([]);
+//   const [searchTerm, setSearchTerm] = useState('');
+//   const [filteredUsers, setFilteredUsers] = useState([]);
+
+//   const handleState = (click) => {
+//     setState(click);
+//   };
+
+//   const allUsers = async () => {
+//     try {
+//       const res = await axios.get('https://ukmasterclassbackend.onrender.com/api/users/getAllUser');
+//       // Assuming your backend returns an array of user objects
+//       const usersData = res.data;
+//       // Sort the users array by createdAt date in descending order (newest first)
+//       const sortedUsers = usersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+//       setUsers(sortedUsers);
+//       setFilteredUsers(sortedUsers); // Initialize filtered users with all users
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     allUsers();
+//   }, []);
+
+//   // Function to handle search
+//   const handleSearch = (event) => {
+//     const term = event.target.value.toLowerCase();
+//     setSearchTerm(term);
+//     const results = users.filter(user =>
+//       user.firstName.toLowerCase().includes(term) ||
+//       user.lastName.toLowerCase().includes(term) ||
+//       user.email.toLowerCase().includes(term) ||
+//       user.contact?.toLowerCase().includes(term) ||
+//       user.country?.toLowerCase().includes(term) ||
+//       user.status.toLowerCase().includes(term)
+//     );
+//     setFilteredUsers(results);
+//   };
+
+//   return (
+//     <>
+//       <div className=" bg-[#eeeeee] min-h-screen flex gap-5  max-sm:gap-0">
+//         {/* dashboard */}
+//         <DashBoard
+//           overView={() => handleState("overView")}
+//           candidate={() => handleState("candidate")}
+//           isOverviewActive={state === "overView"}
+//           isCandidatesActive={state === "candidate"}
+//         />
+//         <div className=" w-full space-y-8  max-sm:pt-0 pr-5 max-sm:pr-0 ">
+//           {/* the counters */}
+//           {state === "overView" && (
+//             <div className="px-4 ">
+//               <p className="py-3 text-2xl font-semibold">Overview</p>
+//               <div
+//                 className={"grid grid-cols-4 w-full gap-5 mb-6 max-sm:grid-cols-2 max-sm:gap-3"}
+//               >
+//                 <Counter
+//                   icon={<FaListCheck />}
+//                   status="Aproveded"
+//                   num={30}
+//                   className={`text-green-600 bg-green-200`}
+//                 />
+//                 <Counter
+//                   icon={<LuBadgeAlert />}
+//                   status="Declined"
+//                   num={20}
+//                   className={`text-red-600 bg-red-200`}
+//                 />
+//                 <Counter
+//                   icon={<PiClockCountdownBold />}
+//                   status="Pending"
+//                   num={5}
+//                   className={`text-yellow-500 bg-yellow-200`}
+//                 />
+//                 <Counter
+//                   icon={<LuRotateCwSquare />}
+//                   status="Candidates"
+//                   num={users.length} // Use the fetched users count
+//                   className={`text-blue-600 bg-blue-200`}
+//                 />
+//               </div>
+
+//               {/* table */}
+//               <div
+//                 className={`bg-[#ffffff] shadow-lg h-[400px]  max-sm:h-full group overflow-hidden mb-2  p-4 rounded-lg max-sm:p-2 `}
+//               >
+//                 <div className="flex w-full justify-between ">
+//                   <p className="font-semibold text-lg pb-3">Latest Candidates</p>
+//                 </div>
+//                 {/* table side */}
+//                 <div className="bg-[#e9fff0] max-sm:p-2 rounded-lg p-4 ">
+//                   {/* Pass the sorted and potentially filtered users as a prop */}
+//                   <Table candidates={filteredUsers.slice(0, 5)} /> {/* Show only the latest 5 on overview */}
+//                 </div>
+//               </div>
+//               <div
+//                 className={` text-green-700 text-lg  font-semibold cursor-pointer max-sm:hidden`}
+//               >
+//                 <p
+//                   onClick={() => {
+//                     setView(!view);
+//                     handleState("candidate");
+//                   }}
+//                 >
+//                   view all
+//                 </p>
+//               </div>
+//             </div>
+//           )}
+
+//           {/* candidates */}
+//           {state === "candidate" && (
+//             <div className="bg-[#ffffff]  shadow-lg min-h-screen  p-4 rounded-lg ">
+//               <div className="flex w-full justify-between mb-3 ">
+//                 <p className="font-semibold text-lg ">Candidates</p>
+
+//                 <input
+//                   type="search"
+//                   placeholder="Search candidates..."
+//                   className="border  border-gray-200  py-1 px-3 rounded-2xl"
+//                   value={searchTerm}
+//                   onChange={handleSearch}
+//                 />
+//               </div>
+//               {/* table side */}
+//               <div className="bg-[#e9fff0]  rounded-lg p-4">
+//                 {/* Pass all sorted and filtered users to the table */}
+//                 <Table candidates={filteredUsers} />
+//               </div>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Admin;
