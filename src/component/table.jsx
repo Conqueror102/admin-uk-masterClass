@@ -9,9 +9,7 @@ const Table = ({ candidates, setCandidates, refreshCounts }) => {
   const [declineReason, setDeclineReason] = useState('');
   const [selectedCandidateIndex, setSelectedCandidateIndex] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-const [candidateToDelete, setCandidateToDelete] = useState(null);
-
-
+  const [candidateToDelete, setCandidateToDelete] = useState(null);
 
   const handleStatusChange = (index, newStatus) => {
     if (newStatus === 'rejected') {
@@ -60,7 +58,6 @@ const [candidateToDelete, setCandidateToDelete] = useState(null);
       alert("Error deleting user");
     }
   };
-  
 
   return (
     <div className="overflow-x-auto w-full">
@@ -81,72 +78,69 @@ const [candidateToDelete, setCandidateToDelete] = useState(null);
         {Array.isArray(candidates) && candidates.length > 0 ? (
           candidates.map((prop, index) => (
             <tbody key={index} className="text-left">
-            <tr className="bg-white hover:bg-[#ececec] hover:text-black pt-4 relative">
-              <td className="px-4 py-3 border-b font-semibold rounded-tl-md rounded-bl-md border-gray-200 max-w-[150px] truncate" title={prop.firstName}>
-                {prop.firstName}
-              </td>
-              <td className="px-4 py-3 border-b border-gray-200 max-w-[150px] truncate" title={prop.lastName}>
-                {prop.lastName}
-              </td>
-              <td className="px-4 py-3 border-b border-gray-200 max-w-[150px] truncate" title={prop.number}>
-                {prop.number}
-              </td>
-              <td className="px-4 py-3 border-b border-gray-200 max-w-[150px] truncate" title={prop.countryOfOrigin}>
-                {prop.countryOfOrigin}
-              </td>
-              <td className="px-4 py-3 border-b border-gray-200 max-w-[150px] truncate" title={new Date(prop.createdAt).toLocaleDateString()}>
-                {new Date(prop.createdAt).toLocaleDateString()}
-              </td>
-              <td className="px-4 py-3 border-b border-gray-200 max-w-[200px] truncate" title={prop.email}>
-                {prop.email}
-              </td>
-              <td className="px-4 py-3 border-b border-gray-200">
-                <select
-                  value={prop.status}
-                  onChange={(e) => handleStatusChange(index, e.target.value)}
-                  className={`py-1 px-3 text-xs font-semibold outline-none rounded-full ${
-                    prop.status === 'approved'
-                      ? 'bg-green-200 text-green-500'
-                      : prop.status === 'rejected'
-                      ? 'bg-red-200 text-red-500'
-                      : 'bg-yellow-200 text-yellow-500'
-                  }`}
-                >
-                  <option value="approved" className="bg-white text-black">
-                    Approved
-                  </option>
-                  <option value="rejected" className="bg-white text-black">
-                    Declined
-                  </option>
-                  <option value="pending" className="bg-white text-black">
-                    Pending
-                  </option>
-                </select>
-              </td>
-              <td className="px-4 py-3 border-b w-30 border-gray-200 rounded-tr-md rounded-br-md">
-                <button
-                  className="bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-500"
-                  onClick={() => handleViewDocuments(prop.documents)}
-                >
-                  View
-                </button>
-
-                <button
-                        onClick={() => {
-                          setCandidateToDelete({ id: prop._id, index });
-                          setDeleteModalOpen(true);
-                        }}
-                        className="text-red-600 hover:text-red-800 text-lg ml-3"
-                        title="Delete User"
-                      >
-                        <RiDeleteBin6Line />
+              <tr className="bg-white hover:bg-[#ececec] hover:text-black pt-4 relative">
+                <td className="px-4 py-3 border-b font-semibold rounded-tl-md rounded-bl-md border-gray-200 max-w-[150px] truncate" title={prop.firstName}>
+                  {prop.firstName}
+                </td>
+                <td className="px-4 py-3 border-b border-gray-200 max-w-[150px] truncate" title={prop.lastName}>
+                  {prop.lastName}
+                </td>
+                <td className="px-4 py-3 border-b border-gray-200 max-w-[150px] truncate" title={prop.number}>
+                  {prop.number}
+                </td>
+                <td className="px-4 py-3 border-b border-gray-200 max-w-[150px] truncate" title={prop.countryOfOrigin}>
+                  {prop.countryOfOrigin}
+                </td>
+                <td className="px-4 py-3 border-b border-gray-200 max-w-[150px] truncate" title={new Date(prop.createdAt).toLocaleDateString()}>
+                  {new Date(prop.createdAt).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-3 border-b border-gray-200 max-w-[200px] truncate" title={prop.email}>
+                  {prop.email}
+                </td>
+                <td className="px-4 py-3 border-b border-gray-200">
+                  <select
+                    value={prop.status}
+                    onChange={(e) => handleStatusChange(index, e.target.value)}
+                    className={`py-1 px-3 text-xs font-semibold outline-none rounded-full ${
+                      prop.status === 'approved'
+                        ? 'bg-green-200 text-green-500'
+                        : prop.status === 'rejected'
+                        ? 'bg-red-200 text-red-500'
+                        : 'bg-yellow-200 text-yellow-500'
+                    }`}
+                  >
+                    <option value="approved" className="bg-white text-black">
+                      Approved
+                    </option>
+                    <option value="rejected" className="bg-white text-black">
+                      Declined
+                    </option>
+                    <option value="pending" className="bg-white text-black">
+                      Pending
+                    </option>
+                  </select>
+                </td>
+                <td className="px-4 py-3 border-b w-30 border-gray-200 rounded-tr-md rounded-br-md">
+                  <button
+                    className="bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-500"
+                    onClick={() => handleViewDocuments(prop.documents)}
+                  >
+                    View
                   </button>
 
-
-              </td>
-            </tr>
-          </tbody>
-          
+                  <button
+                    onClick={() => {
+                      setCandidateToDelete({ id: prop._id, index });
+                      setDeleteModalOpen(true);
+                    }}
+                    className="text-red-600 hover:text-red-800 text-lg ml-3"
+                    title="Delete User"
+                  >
+                    <RiDeleteBin6Line />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
           ))
         ) : (
           <tbody>
@@ -157,36 +151,35 @@ const [candidateToDelete, setCandidateToDelete] = useState(null);
         )}
       </table>
 
-{/* delete modal */}
+      {/* delete modal */}
       {deleteModalOpen && (
-  <div className="fixed inset-0 bg-[#000000aa] flex items-center justify-center z-50">
-    <div className="bg-white rounded-lg p-6 w-[90%] max-w-md relative">
-      <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-      <p>Are you sure you want to delete this user?</p>
+        <div className="fixed inset-0 bg-[#000000aa] flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[90%] max-w-md relative">
+            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+            <p>Are you sure you want to delete this user?</p>
 
-      <div className="flex justify-end mt-6 space-x-4">
-        <button
-          onClick={() => setDeleteModalOpen(false)}
-          className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-        >
-          Cancel
-        </button>
+            <div className="flex justify-end mt-6 space-x-4">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
 
-        <button
-          onClick={async () => {
-            await handleDeleteUser(candidateToDelete.id, candidateToDelete.index);
-            setDeleteModalOpen(false);
-            setCandidateToDelete(null);
-          }}
-          className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-500"
-        >
-          Yes, Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+              <button
+                onClick={async () => {
+                  await handleDeleteUser(candidateToDelete.id, candidateToDelete.index);
+                  setDeleteModalOpen(false);
+                  setCandidateToDelete(null);
+                }}
+                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-500"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Document Modal */}
       {documentModalOpen && (
@@ -197,7 +190,7 @@ const [candidateToDelete, setCandidateToDelete] = useState(null);
               className="absolute top-2 right-3 text-red-500 hover:text-black"
               onClick={() => setDocumentModalOpen(false)}
             >
-              ✕
+              x
             </button>
             {selectedDocuments ? (
               <ul className="space-y-2">
@@ -233,7 +226,7 @@ const [candidateToDelete, setCandidateToDelete] = useState(null);
                 setDeclineReason('');
               }}
             >
-              ✕
+              x
             </button>
 
             <textarea
