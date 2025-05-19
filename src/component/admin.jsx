@@ -57,7 +57,7 @@ const Admin = () => {
           Authorization: `Bearer ${token}`, // Inject token here
         },
       });
-      const usersData = res.data;
+      const usersData = res.data.data; // <-- Fix: access .data.data
       const sortedUsers = usersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setUsers(sortedUsers);
       setFilteredUsers(sortedUsers);
@@ -181,6 +181,7 @@ const getCounts = async () => {
                   candidates={candidates.slice(0, 5)}
                   setCandidates={setCandidates}
                   refreshCounts={getCounts}
+                  refreshTbData={fetchCandidates}
                 />
               </div>
             </div>

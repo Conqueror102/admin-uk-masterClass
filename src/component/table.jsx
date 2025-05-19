@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 
-const Table = ({ candidates, setCandidates, refreshCounts }) => {
+const Table = ({ candidates, setCandidates, refreshCounts, refreshTbData }) => {
   const [documentModalOpen, setDocumentModalOpen] = useState(false);
   const [selectedDocuments, setSelectedDocuments] = useState(null);
   const [declineModalOpen, setDeclineModalOpen] = useState(false);
@@ -21,70 +21,68 @@ const Table = ({ candidates, setCandidates, refreshCounts }) => {
   };
 
   const updateStatus = async (index, newStatus, reason = '') => {
-  const updatedCandidates = [...candidates];
+    const updatedCandidates = [...candidates];
 
-  try {
-    const token = localStorage.getItem("token"); // 🔐 Get the token
+    try {
+      const token = localStorage.getItem("token"); // 🔐 Get the token
 
-    await axios.patch(
-      `https://ukmasterclassbackend.onrender.com/api/users/${updatedCandidates[index]._id}/status`,
-      {
-        status: newStatus,
-        rejectionReason: reason,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // ✅ Add the token to headers
+      await axios.patch(
+        `https://ukmasterclassbackend.onrender.com/api/users/${updatedCandidates[index]._id}/status`,
+        {
+          status: newStatus,
+          rejectionReason: reason,
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ Add the token to headers
+          },
+        }
+      );
 
-    updatedCandidates[index].status = newStatus;
-    setCandidates(updatedCandidates);
+      updatedCandidates[index].status = newStatus;
+      if (setCandidates) setCandidates(updatedCandidates); // <-- Fix: check if setCandidates exists
 
-    if (refreshCounts) refreshCounts();
+      if (refreshCounts) refreshCounts();
 
-    alert("Status updated successfully");
-  } catch (error) {
-    console.error("Failed to update status:", error);
-    alert("Something went wrong. Try again.");
-  }
-};
-
-
+      alert("Status updated successfully");
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      alert("Something went wrong. Try again.");
+    }
+  };
 
   const handleViewDocuments = (documents) => {
     setSelectedDocuments(documents);
     setDocumentModalOpen(true);
   };
 
- const handleDeleteUser = async (userId, index) => {
-  try {
-    const token = localStorage.getItem("token"); // 🔐 Get token
+  const handleDeleteUser = async (userId, index) => {
+    try {
+      const token = localStorage.getItem("token"); // 🔐 Get token
 
-    await axios.delete(
-      `https://ukmasterclassbackend.onrender.com/api/admin/${userId}/deleteUser`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // ✅ Add token here
-        },
-      }
-    );
+      await axios.delete(
+        `https://ukmasterclassbackend.onrender.com/api/admin/${userId}/deleteUser`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ Add token here
+          },
+        }
+      );
 
-    // Update local state
-    const updated = [...candidates];
-    updated.splice(index, 1);
-    setCandidates(updated);
+      // Update local state
+      const updated = [...candidates];
+      updated.splice(index, 1);
+      if (setCandidates) setCandidates(updated); // <-- Fix: check if setCandidates exists
 
-    if (refreshCounts) refreshCounts();
+      if (refreshCounts) refreshCounts();
+      if (refreshTbData) refreshTbData();
 
-    alert("User deleted successfully");
-  } catch (error) {
-    console.error("Failed to delete user:", error);
-    alert("Error deleting user");
-  }
-};
-
+      alert("User deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      alert("Error deleting user");
+    }
+  };
 
   return (
     <div className="overflow-x-auto w-full">
@@ -147,7 +145,7 @@ const Table = ({ candidates, setCandidates, refreshCounts }) => {
                     </option>
                   </select>
                 </td>
-                <td className="px-4 py-3 border-b w-30 border-gray-200 rounded-tr-md rounded-br-md">
+                <td className="px-4 py-3 border-b w-30 border-gray-200 rounded-tr-md rounded-br-md  flex">
                   <button
                     className="bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-500"
                     onClick={() => handleViewDocuments(prop.documents)}
