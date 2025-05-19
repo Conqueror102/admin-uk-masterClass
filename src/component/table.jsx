@@ -21,43 +21,70 @@ const Table = ({ candidates, setCandidates, refreshCounts }) => {
   };
 
   const updateStatus = async (index, newStatus, reason = '') => {
-    const updatedCandidates = [...candidates];
-    try {
-      await axios.patch(
-        `https://ukmasterclassbackend.onrender.com/api/users/${updatedCandidates[index]._id}/status`,
-        {
-          status: newStatus,
-          rejectionReason: reason,
-        }
-      );
-      updatedCandidates[index].status = newStatus;
-      setCandidates(updatedCandidates);
-      if (refreshCounts) refreshCounts();
-      alert("Status updated successfully");
-    } catch (error) {
-      console.error("Failed to update status:", error);
-      alert("Something went wrong. Try again.");
-    }
-  };
+  const updatedCandidates = [...candidates];
+
+  try {
+    const token = localStorage.getItem("token"); // 🔐 Get the token
+
+    await axios.patch(
+      `https://ukmasterclassbackend.onrender.com/api/users/${updatedCandidates[index]._id}/status`,
+      {
+        status: newStatus,
+        rejectionReason: reason,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ Add the token to headers
+        },
+      }
+    );
+
+    updatedCandidates[index].status = newStatus;
+    setCandidates(updatedCandidates);
+
+    if (refreshCounts) refreshCounts();
+
+    alert("Status updated successfully");
+  } catch (error) {
+    console.error("Failed to update status:", error);
+    alert("Something went wrong. Try again.");
+  }
+};
+
+
 
   const handleViewDocuments = (documents) => {
     setSelectedDocuments(documents);
     setDocumentModalOpen(true);
   };
 
-  const handleDeleteUser = async (userId, index) => {
-    try {
-      await axios.delete(`https://ukmasterclassbackend.onrender.com/api/admin/${userId}/deleteUser`);
-      const updated = [...candidates];
-      updated.splice(index, 1);
-      setCandidates(updated);
-      if (refreshCounts) refreshCounts();
-      alert("User deleted successfully");
-    } catch (error) {
-      console.error("Failed to delete user:", error);
-      alert("Error deleting user");
-    }
-  };
+ const handleDeleteUser = async (userId, index) => {
+  try {
+    const token = localStorage.getItem("token"); // 🔐 Get token
+
+    await axios.delete(
+      `https://ukmasterclassbackend.onrender.com/api/admin/${userId}/deleteUser`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ Add token here
+        },
+      }
+    );
+
+    // Update local state
+    const updated = [...candidates];
+    updated.splice(index, 1);
+    setCandidates(updated);
+
+    if (refreshCounts) refreshCounts();
+
+    alert("User deleted successfully");
+  } catch (error) {
+    console.error("Failed to delete user:", error);
+    alert("Error deleting user");
+  }
+};
+
 
   return (
     <div className="overflow-x-auto w-full">

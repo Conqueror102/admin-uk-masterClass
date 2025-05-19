@@ -50,7 +50,13 @@ const Admin = () => {
 
   const allUsers = async () => {
     try {
-      const res = await axios.get('https://ukmasterclassbackend.onrender.com/api/users/getAllUser');
+      const token = localStorage.getItem("token");
+      const res = await axios.get('https://ukmasterclassbackend.onrender.com/api/users/getAllUser',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Inject token here
+        },
+      });
       const usersData = res.data;
       const sortedUsers = usersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setUsers(sortedUsers);
@@ -60,21 +66,37 @@ const Admin = () => {
     }
   };
 
-  const getCounts = async () => {
-    try {
-      const response = await axios.get(
-        "https://ukmasterclassbackend.onrender.com/api/users/status-counts"
-      );
-      setCounts(response.data.data);
-    } catch (error) {
-      console.error("Error fetching counts:", error);
-    }
-  };
+const getCounts = async () => {
+  try {
+    const token = localStorage.getItem("token"); // Get token from storage
+
+    const response = await axios.get(
+      "https://ukmasterclassbackend.onrender.com/api/users/status-counts",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Inject token here
+        },
+      }
+    );
+
+    setCounts(response.data.data);
+  } catch (error) {
+    console.error("Error fetching counts:", error);
+  }
+};
+
+
 
   const fetchCandidates = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get(
-        "https://ukmasterclassbackend.onrender.com/api/users/getAllUser"
+        "https://ukmasterclassbackend.onrender.com/api/users/getAllUser",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Inject token here
+        },
+      }
       );
       setCandidates(response.data.data);
     } catch (error) {
