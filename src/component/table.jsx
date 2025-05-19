@@ -21,24 +21,36 @@ const Table = ({ candidates, setCandidates, refreshCounts }) => {
   };
 
   const updateStatus = async (index, newStatus, reason = '') => {
-    const updatedCandidates = [...candidates];
-    try {
-      await axios.patch(
-        `https://ukmasterclassbackend.onrender.com/api/users/${updatedCandidates[index]._id}/status`,
-        {
-          status: newStatus,
-          rejectionReason: reason,
-        }
-      );
-      updatedCandidates[index].status = newStatus;
-      setCandidates(updatedCandidates);
-      if (refreshCounts) refreshCounts();
-      alert("Status updated successfully");
-    } catch (error) {
-      console.error("Failed to update status:", error);
-      alert("Something went wrong. Try again.");
-    }
-  };
+  const updatedCandidates = [...candidates];
+
+  try {
+    const token = localStorage.getItem("token"); 
+
+    await axios.patch(
+      `https://ukmasterclassbackend.onrender.com/api/users/${updatedCandidates[index]._id}/status`,
+      {
+        status: newStatus,
+        rejectionReason: reason,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    updatedCandidates[index].status = newStatus;
+    setCandidates(updatedCandidates);
+
+    if (refreshCounts) refreshCounts();
+
+    alert("Status updated successfully");
+  } catch (error) {
+    console.error("Failed to update status:", error);
+    alert("Something went wrong. Try again.");
+  }
+};
+
 
   const handleViewDocuments = (documents) => {
     setSelectedDocuments(documents);

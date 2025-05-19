@@ -61,20 +61,35 @@ const Admin = () => {
   };
 
   const getCounts = async () => {
-    try {
-      const response = await axios.get(
-        "https://ukmasterclassbackend.onrender.com/api/users/status-counts"
-      );
-      setCounts(response.data.data);
-    } catch (error) {
-      console.error("Error fetching counts:", error);
-    }
-  };
+  try {
+    const token = localStorage.getItem("token"); // Get token from storage
+
+    const response = await axios.get(
+      "https://ukmasterclassbackend.onrender.com/api/users/status-counts",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Inject token here
+        },
+      }
+    );
+
+    setCounts(response.data.data);
+  } catch (error) {
+    console.error("Error fetching counts:", error);
+  }
+};
+
 
   const fetchCandidates = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get(
-        "https://ukmasterclassbackend.onrender.com/api/users/getAllUser"
+        "https://ukmasterclassbackend.onrender.com/api/users/getAllUser",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Inject token here
+        },
+      }
       );
       setCandidates(response.data.data);
     } catch (error) {
