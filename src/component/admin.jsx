@@ -50,7 +50,13 @@ const Admin = () => {
 
   const allUsers = async () => {
     try {
-      const res = await axios.get('https://ukmasterclassbackend.onrender.com/api/users/getAllUser');
+      const token = localStorage.getItem("token");
+      const res = await axios.get('https://ukmasterclassbackend.onrender.com/api/users/getAllUser',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Inject token here
+        },
+      });
       const usersData = res.data;
       const sortedUsers = usersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setUsers(sortedUsers);
@@ -60,7 +66,7 @@ const Admin = () => {
     }
   };
 
-  const getCounts = async () => {
+const getCounts = async () => {
   try {
     const token = localStorage.getItem("token"); // Get token from storage
 
@@ -78,6 +84,7 @@ const Admin = () => {
     console.error("Error fetching counts:", error);
   }
 };
+
 
 
   const fetchCandidates = async () => {

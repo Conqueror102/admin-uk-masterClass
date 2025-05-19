@@ -24,7 +24,7 @@ const Table = ({ candidates, setCandidates, refreshCounts }) => {
   const updatedCandidates = [...candidates];
 
   try {
-    const token = localStorage.getItem("token"); 
+    const token = localStorage.getItem("token"); // 🔐 Get the token
 
     await axios.patch(
       `https://ukmasterclassbackend.onrender.com/api/users/${updatedCandidates[index]._id}/status`,
@@ -34,7 +34,7 @@ const Table = ({ candidates, setCandidates, refreshCounts }) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // ✅ Add the token to headers
         },
       }
     );
@@ -52,24 +52,39 @@ const Table = ({ candidates, setCandidates, refreshCounts }) => {
 };
 
 
+
   const handleViewDocuments = (documents) => {
     setSelectedDocuments(documents);
     setDocumentModalOpen(true);
   };
 
-  const handleDeleteUser = async (userId, index) => {
-    try {
-      await axios.delete(`https://ukmasterclassbackend.onrender.com/api/admin/${userId}/deleteUser`);
-      const updated = [...candidates];
-      updated.splice(index, 1);
-      setCandidates(updated);
-      if (refreshCounts) refreshCounts();
-      alert("User deleted successfully");
-    } catch (error) {
-      console.error("Failed to delete user:", error);
-      alert("Error deleting user");
-    }
-  };
+ const handleDeleteUser = async (userId, index) => {
+  try {
+    const token = localStorage.getItem("token"); // 🔐 Get token
+
+    await axios.delete(
+      `https://ukmasterclassbackend.onrender.com/api/admin/${userId}/deleteUser`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ Add token here
+        },
+      }
+    );
+
+    // Update local state
+    const updated = [...candidates];
+    updated.splice(index, 1);
+    setCandidates(updated);
+
+    if (refreshCounts) refreshCounts();
+
+    alert("User deleted successfully");
+  } catch (error) {
+    console.error("Failed to delete user:", error);
+    alert("Error deleting user");
+  }
+};
+
 
   return (
     <div className="overflow-x-auto w-full">
